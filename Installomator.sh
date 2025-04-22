@@ -26,10 +26,10 @@ export PATH=/usr/bin:/bin:/usr/sbin:/sbin
 # also no actual installation will be performed
 # debug mode 1 will download to the directory the script is run in, but will not check the version
 # debug mode 2 will download to the temp directory, check for blocking processes, check the version, but will not install anything or remove the current version
-DEBUG=1
+DEBUG=0
 
 # notify behavior
-NOTIFY=success
+NOTIFY=""
 # options:
 #   - success      notify the user on success
 #   - silent       no notifications
@@ -46,7 +46,7 @@ PROMPT_TIMEOUT=86400
 
 # behavior when blocking processes are found
 # BLOCKING_PROCESS_ACTION is ignored if app label uses updateTool
-BLOCKING_PROCESS_ACTION=tell_user
+BLOCKING_PROCESS_ACTION=""
 # options:
 #   - ignore       continue even when blocking processes are found
 #   - quit         app will be told to quit nicely if running
@@ -83,7 +83,7 @@ BLOCKING_PROCESS_ACTION=tell_user
 
 
 # logo-icon used in dialog boxes if app is blocking
-LOGO=appstore
+LOGO=""
 # options:
 #   - appstore      Icon is Apple App Store (default)
 #   - jamf          JAMF Pro
@@ -100,7 +100,7 @@ LOGO=appstore
 
 
 # App Store apps handling
-IGNORE_APP_STORE_APPS=no
+IGNORE_APP_STORE_APPS=""
 # options:
 #  - no            If the installed app is from App Store (which include VPP installed apps)
 #                  it will not be touched, no matter its version (default)
@@ -141,13 +141,13 @@ REOPEN="yes"
 
 
 # Interrupt Do Not Disturb (DND) full screen apps
-INTERRUPT_DND="yes"
+INTERRUPT_DND="no"
 # options:
 #  - yes           Script will run without checking for DND full screen apps.
 #  - no            Script will exit when an active DND full screen app is detected.
 
 # Comma separated list of app names to ignore when evaluating DND
-IGNORE_DND_APPS=""
+IGNORE_DND_APPS="Google Chrome,Safari,Software Update,Slack,caffeinate,FaceTime,ControlCenter,OBS,zoom.us,Single-Use - Display,Teams"
 # example that will ignore browsers when evaluating DND:
 # IGNORE_DND_APPS="firefox,Google Chrome,Safari,Microsoft Edge,Opera,Amphetamine,caffeinate"
 
@@ -159,7 +159,7 @@ IGNORE_DND_APPS=""
 
 # This requires Swift Dialog 2.11.2 or higher.
 
-DIALOG_CMD_FILE=""
+DIALOG_CMD_FILE="/var/tmp/dialog.log"
 # When this variable is set, Installomator will write Swift Dialog commands to this path.
 # Installomator will not launch Swift Dialog. The process calling Installomator will have
 # launch and configure Swift Dialog to listen to this file.
@@ -170,7 +170,7 @@ DIALOG_LIST_ITEM_NAME=""
 # listitem.
 # When the variable is unset, progress will be sent to Swift Dialog's main progress bar.
 
-NOTIFY_DIALOG=0
+NOTIFY_DIALOG=1
 # If this variable is set to 1, then we will check for installed Swift Dialog v. 2 or later, and use that for notification
 
 
@@ -6137,6 +6137,30 @@ microsoftdefenderatp)
     fi
     updateTool="/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/msupdate"
     updateToolArguments=( --install --apps WDAV00 )
+    ;;
+microsoftdotnetruntime8)
+    name="Microsoft .NET Runtime 8.0"
+    type="pkg"
+    expectedTeamID="UBF8T346G9"
+    releaseURL="https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/8.0/releases.json"
+    appNewVersion=$(curl --silent "$releaseURL" | grep -i "\"latest-runtime\"" | awk '{print $2}' | cut -d '"' -f2)
+    if [[ $(arch) == arm64 ]]; then
+        downloadURL=$(curl --silent "$releaseURL" | grep -i -m 1 "dotnet-runtime-$appNewVersion-osx-arm64.pkg" | awk '{print $2}' | cut -d '"' -f2)
+    elif [[ $(arch) == i386 ]]; then
+        downloadURL=$(curl --silent "$releaseURL" | grep -i -m 1 "dotnet-runtime-$appNewVersion-osx-x64.pkg" | awk '{print $2}' | cut -d '"' -f2)
+    fi
+    ;;
+microsoftdotnetsdk8)
+  name="Microsoft .NET SDK 8.0"
+  type="pkg"
+  expectedTeamID="UBF8T346G9"
+  releaseURL="https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/8.0/releases.json"
+  appNewVersion=$(curl --silent "$releaseURL" | grep -i "\"latest-sdk\"" | awk '{print $2}' | cut -d '"' -f2)
+  if [[ $(arch) == arm64 ]]; then
+    downloadURL=$(curl --silent "$releaseURL" | grep -i -m 1 "dotnet-sdk-$appNewVersion-osx-arm64.pkg" | awk '{print $2}' | cut -d '"' -f2)
+  elif [[ $(arch) == i386 ]]; then
+    downloadURL=$(curl --silent "$releaseURL" | grep -i -m 1 "dotnet-sdk-$appNewVersion-osx-x64.pkg" | awk '{print $2}' | cut -d '"' -f2)
+  fi
     ;;
 microsoftedge|\
 microsoftedgeconsumerstable|\
