@@ -1555,10 +1555,11 @@ valuesfromarguments)
 codexbar)
     name="CodexBar"
     type="zip"
-    archiveName="CodexBar-macos-universal-[0-9.]+\.zip$"
-    downloadURL=$(downloadURLFromGit steipete CodexBar)
-    appNewVersion=$(versionFromGit steipete CodexBar)
-    expectedTeamID="Y5PE65HELJ"
+    # Scrape or query the GitHub API asset list using your regex
+    # This ensures it explicitly grabs the universal macOS zip, ignoring .dSYM.zip
+    downloadURL=$(curl -sL "https://api.github.com/repos/steipete/CodexBar/releases/latest" \
+                  | grep -oEi "https://github.com/steipete/CodexBar/releases/download/[^\"]+CodexBar-macos-universal-[0-9.]+\.zip")
+    expectedTeamID="Y5PE65HELJ" # Replace with the actual 10-character Team ID
     ;;
 gemini)
     name="Gemini"
